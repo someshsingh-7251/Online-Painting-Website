@@ -1,111 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            overflow: hidden;
-            outline: none;
-        }
-        input, img{
-            position: absolute;
-            top: 5px;
-        }
-        input:nth-child(1) {
-            left: calc(50% - 150px);
-        }
-        input:nth-child(2) {
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        input:nth-child(3) {
-            left: calc(50% + 100px);
-            background-color: black;
-            color: white;
-            border-radius: 20px;
-            padding: 0 10px 0 10px;
-            border: 2px dotted white;
-        }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painting Application</title>
+  <style>
+    /* === INLINE CSS START === */
+    body, html { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    #canvas { border: 1px solid #000; touch-action: none; display: block; margin: auto; }
+    .toolbar {
+      display: flex;
+      padding: 10px;
+      background: #eee;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .toolbar button {
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    .toolbar input[type="color"],
+    .toolbar input[type="range"] {
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #f4f4f4;
+      font-size: 14px;
+      margin-top: 20px;
+      border-top: 1px solid #ccc;
+    }
+    /* === INLINE CSS END === */
+  </style>
 </head>
-
 <body>
-    <canvas id="canvas"></canvas>
-    <form>
-        <input type="color" id="clr">
-        <input type="range" min="0" max="50" value="15" id="size">
-        <input type="button" value="reset" id="r">
-    </form>
-    <script>
-        window.addEventListener('load', () => {
-            let canvas = document.getElementById('canvas')
-            let ctx = canvas.getContext('2d')
 
-            canvas.height = window.innerHeight*2
-            canvas.width = window.innerWidth
-            let painting = true
+  <div class="toolbar">
+    <button id="pencil">Pencil</button>
+    <button id="line">Line</button>
+    <button id="rect">Rectangle</button>
+    <button id="ellipse">Ellipse</button>
+    <input type="color" id="color-picker" value="#000000"/>
+    <label>Brush size:
+      <input type="range" id="brush-size" min="1" max="50" value="3"/>
+    </label>
+    <button id="clear">Clear</button>
+    <button id="save">Save</button>
+  </div>
 
-            function startPosition(e) {
-                painting = true
-                draw(e)
-            }
-            function finishedPosition() {
-                painting = false
-                ctx.beginPath()
-            }
-            function draw(e) {
-if(e.cancelable){e.preventDefault();}         
-                if (!painting) return
-                let size = document.getElementById('size')
-                let y = size.value
-                ctx.lineWidth = y
-                ctx.lineCap = "round"
-                ctx.lineTo(e.touches[0].clientX, e.touches[0].clientY)
-                let clr = document.getElementById('clr')
-                let x = clr.value
-                ctx.strokeStyle = x
-                ctx.stroke()
-                ctx.beginPath()
-                ctx.moveTo(e.touches[0].clientX, e.touches[0].clientY)
-            }
-            function draw2(e) {
-                if (!painting) return
-                let size = document.getElementById('size')
-                let y = size.value
-                ctx.lineWidth = y
-                ctx.lineCap = "round"
-                ctx.lineTo(e.clientX, e.clientY)
-                let clr = document.getElementById('clr')
-                let x = clr.value
-                ctx.strokeStyle = x
-                ctx.stroke()
-                ctx.beginPath()
-                ctx.moveTo(e.clientX, e.clientY)
-            }
-            function jnjel() {
-                ctx.strokeStyle = "white"
-            }
-            function f() {
-                ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
-            let r = document.getElementById('r')
-            canvas.addEventListener("touchstart", startPosition)
-            canvas.addEventListener("touchend", finishedPosition)
-            canvas.addEventListener("touchmove", draw)
-canvas.addEventListener("mousedown", startPosition)
-            canvas.addEventListener("mouseup", finishedPosition)
-            canvas.addEventListener("mousemove", draw2)
-            r.addEventListener("click", f)
-        })
-    </script>
+  <canvas id="canvas" width="800" height="600"></canvas>
+
+  <footer>
+    🔧 Made with ❤️ by Somesh Singh | 🎨 Painting App
+  </footer>
+
+  <script>
+    // === INLINE JS START ===
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let tool = 'pencil';
+    let drawing = false;
+    let startX, startY;
+    let brushColor = '#000';
+    let brushSize = 3;
+
+    // Toolbar elements
+    document.getElementById('pencil').onclick = () => tool = 'pencil';
+    document.getElementById('line').onclick = () => tool = 'line';
+    document.getElementById('rect').onclick = () => tool = 'rect';
+    document.getElementById('ellipse').onclick = () => tool = 'ellipse';
+    document.getElementById('color-picker').oninput = e => brushColor = e.target.value;
+    document.getElementById('brush-size').oninput = e => brushSize = e.target.value;
+    document.getElementById('clear').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.getElementById('save').onclick = () => {
+      const link = document.createElement('a');
+      link.download = 'painting.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    };
+
+    canvas.onpointerdown = (e) => {
+      drawing = true;
+      startX = e.offsetX; startY = e.offsetY;
+      if (tool === 'pencil') {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+      }
+    };
+
+    canvas.onpointermove = (e) => {
+      if (!drawing) return;
+      const x = e.offsetX, y = e.offsetY;
+      ctx.strokeStyle = brushColor;
+      ctx.lineWidth = brushSize;
+      if (tool === 'pencil') {
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+    };
+
+    canvas.onpointerup = (e) => {
+      if (!drawing) return;
+      drawing = false;
+      const x2 = e.offsetX, y2 = e.offsetY;
+      ctx.strokeStyle = brushColor;
+      ctx.lineWidth = brushSize;
+      ctx.beginPath();
+      if (tool === 'line') {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      } else if (tool === 'rect') {
+        ctx.strokeRect(startX, startY, x2 - startX, y2 - startY);
+      } else if (tool === 'ellipse') {
+        ctx.ellipse(
+          (startX + x2) / 2,
+          (startY + y2) / 2,
+          Math.abs(x2 - startX) / 2,
+          Math.abs(y2 - startY) / 2,
+          0, 0, 2 * Math.PI
+        );
+        ctx.stroke();
+      }
+    };
+
+    // Disable context menu on canvas
+    canvas.oncontextmenu = e => e.preventDefault();
+    // === INLINE JS END ===
+  </script>
+
 </body>
 </html>

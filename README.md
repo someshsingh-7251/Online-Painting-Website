@@ -1,6 +1,6 @@
 ![Profile views](https://komarev.com/ghpvc/?username=someshsingh-7251)
 
-# Painting Application
+# Online Painting Website
 
 A simple yet powerful painting application built using Java, designed to allow users to create and manipulate graphics with ease. The project provides basic painting features like drawing shapes, choosing colors, undo/redo, and saving/loading canvases, making it a great foundation for learning GUI programming and graphic manipulation.
 
@@ -20,13 +20,6 @@ To run this painting application on your local machine, follow these steps:
 ### Prerequisites
 
 - **Java Development Kit (JDK)**: Make sure you have Java installed on your machine. You can download it [here](https://www.oracle.com/java/technologies/javase-downloads.html).
-
-### Clone the Repository
-
-```bash
-git clone https://github.com/someshsingh-7251/Painting-Application-.git
-cd Painting-Application-
-```
 
 ### Compile and Run the Application
 
@@ -84,3 +77,12 @@ You can reach out to me on various platforms. Click the icons below to visit my 
 
 
 ---
+
+## 🌐 Live Demo
+
+🔗 [Online Painting Website](https://someshsingh-7251.github.io/Online-Painting-Website/)
+---
+
+## 🧑‍💻 Author
+
+Developed with ❤️ by [Somesh Singh](https://www.linkedin.com/in/someshsingh-2aa796229/)
